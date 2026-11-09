@@ -1,0 +1,12 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Résultats</title>
+<style>body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}details{border:1px solid #ccc;border-radius:8px;padding:.6rem 1rem;margin:.5rem 0}pre{white-space:pre-wrap;margin:.2rem 0}.l{color:#b00}</style></head><body>
+<h1>Résultats du devoir</h1><input id="k" type="password" placeholder="Clé ADMIN_KEY"> <button onclick="go()">Afficher</button><div id="o"></div>
+<script>
+async function go(){const r=await fetch('/api/results?key='+encodeURIComponent(k.value));const d=await r.json();
+if(!r.ok){o.textContent=d.error;return}
+const f=t=>t?new Date(t).toLocaleString('fr-FR'):'—';
+o.innerHTML='<p>'+d.length+' élève(s)</p>'+d.sort((a,b)=>a.nom.localeCompare(b.nom)).map(s=>{
+const a=s.answers||{};const keys=Object.keys(a).filter(x=>a[x]).sort((x,y)=>x.localeCompare(y,'fr',{numeric:true}));
+return '<details><summary><b>'+esc(s.nom)+' '+esc(s.prenom)+'</b> — '+(s.submitted?'rendu '+f(s.submittedAt)+(s.late?' <span class=l>(en retard)</span>':''):'<span class=l>non rendu</span>')+'</summary><p>Début : '+f(s.start)+'</p>'+keys.map(x=>'<b>'+x+'</b><pre>'+esc(a[x])+'</pre>').join('')+'</details>'}).join('')}
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+</script></body></html>
